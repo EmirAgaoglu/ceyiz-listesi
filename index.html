@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Full+Full Çeyiz Listesi & Bütçe Takip</title>
+  <style>
+    :root {
+      --bg: #f6f4f0;
+      --surface: #ffffff;
+      --surface-soft: #faf9f6;
+      --border: #e5e0d8;
+      --text: #1f2421;
+      --muted: #6b726e;
+      --primary: #2d5a4c;
+      --primary-hover: #214439;
+      --primary-soft: #e8f1ee;
+      --accent: #c58b52;
+      --danger: #b8443a;
+      --danger-soft: #fceceb;
+      --success: #2a7a52;
+      --success-soft: #e6f5ed;
+      --radius: 14px;
+      --shadow: 0 2px 10px rgba(31, 36, 33, 0.05);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding-bottom: 64px;
+    }
+
+    .container {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 20px 16px;
+    }
+
+    /* Header */
+    header {
+      background: linear-gradient(135deg, #244a3e 0%, #346958 100%);
+      color: #fff;
+      padding: 26px 22px;
+      border-radius: 18px;
+      box-shadow: 0 8px 24px rgba(36, 74, 62, 0.16);
+      margin-bottom: 18px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .header-title h1 {
+      font-size: 1.55rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .header-title p {
+      font-size: 0.9rem;
+      opacity: 0.88;
+      margin-top: 4px;
+    }
+    .save-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.14);
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      backdrop-filter: blur(4px);
+    }
+    .save-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #6ee7b7;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      box-shadow: var(--shadow);
+    }
+    .stat-label {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .stat-value {
+      font-size: 1.45rem;
+      font-weight: 700;
+      margin-top: 6px;
+      color: var(--text);
+    }
+    .stat-sub {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #eae6df;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--primary);
+      border-radius: 999px;
+      transition: width 0.3s ease;
+    }
+    .budget-edit-btn {
+      background: var(--primary-soft);
+      color: var(--primary);
+      border: none;
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .budget-edit-btn:hover { background: #d8e8e2; }
+    .over-budget { color: var(--danger) !important; }
+    .under-budget { color: var(--success) !important; }
+
+    /* Toolbar */
+    .toolbar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      box-shadow: var(--shadow);
+      margin-bottom: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .toolbar-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .search-box {
+      flex: 1 1 240px;
+      position: relative;
+    }
+    .search-box input {
+      width: 100%;
+      padding: 10px 14px 10px 36px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.92rem;
+      background: var(--surface-soft);
+      color: var(--text);
+      outline: none;
+    }
+    .search-box input:focus {
+      border-color: var(--primary);
+      background: #fff;
+    }
+    .search-icon {
+      position: absolute;
+      left: 11px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    button.btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 14px;
+      border-radius: 10px;
+      font-size: 0.86rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      transition: all 0.15s ease;
+    }
+    button.btn:hover { background: var(--surface-soft); }
+    button.btn-primary {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+    button.btn-primary:hover { background: var(--primary-hover); }
+    button.btn-danger {
+      color: var(--danger);
+      border-color: #f0c9c5;
+      background: #fff;
+    }
+    button.btn-danger:hover { background: var(--danger-soft); }
+
+    /* Filter Pills */
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .tab {
+      padding: 7px 13px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface-soft);
+      color: var(--muted);
+      font-size: 0.83rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .tab:hover { border-color: var(--primary); color: var(--primary); }
+    .tab.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+    .status-pills {
+      display: inline-flex;
+      background: var(--surface-soft);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 3px;
+    }
+    .status-pill {
+      border: none;
+      background: transparent;
+      padding: 6px 12px;
+      border-radius: 7px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+    }
+    .status-pill.active {
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+
+    /* Category Sections */
+    .category-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 16px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .category-header {
+      padding: 15px 18px;
+      background: var(--surface-soft);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .category-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .category-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.84rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .mini-bar {
+      width: 72px;
+      height: 6px;
+      background: #e2ddd5;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .mini-fill {
+      height: 100%;
+      background: var(--primary);
+    }
+    .subcategory-header {
+      padding: 10px 18px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--accent);
+      background: #fdfcfa;
+      border-bottom: 1px solid #f0ece5;
+      border-top: 1px solid #f0ece5;
+    }
+    .subcategory-header:first-child { border-top: none; }
+
+    /* Item Row */
+    .item-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 18px;
+      border-bottom: 1px solid #f2eee8;
+      transition: background 0.12s;
+    }
+    .item-row:last-child { border-bottom: none; }
+    .item-row:hover { background: #fbfaf7; }
+    .item-row.checked { background: #f6fbf8; }
+
+    .checkbox-wrap {
+      padding-top: 2px;
+    }
+    .item-checkbox {
+      width: 22px;
+      height: 22px;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+    .item-main {
+      flex: 1;
+      min-width: 0;
+      cursor: pointer;
+    }
+    .item-name {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text);
+      word-break: break-word;
+    }
+    .item-row.checked .item-name {
+      text-decoration: line-through;
+      color: var(--muted);
+    }
+    .item-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 5px;
+    }
+    .badge {
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: #f1eee9;
+      color: #4f5752;
+      font-weight: 500;
+    }
+    .badge-price {
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-weight: 600;
+    }
+    .badge-note {
+      background: #fef6e7;
+      color: #8c5a18;
+    }
+
+    .item-actions {
+      display: flex;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .icon-btn {
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--muted);
+      border-radius: 8px;
+      width: 34px;
+      height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.12s;
+    }
+    .icon-btn:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-soft); }
+    .icon-btn.del:hover { border-color: var(--danger); color: var(--danger); background: var(--danger-soft); }
+
+    .empty-state {
+      text-align: center;
+      padding: 46px 20px;
+      color: var(--muted);
+      background: var(--surface);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(18, 24, 21, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 1000;
+      backdrop-filter: blur(2px);
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--surface);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 480px;
+      padding: 22px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.22);
+      max-height: 92vh;
+      overflow-y: auto;
+    }
+    .modal h2 {
+      font-size: 1.15rem;
+      margin-bottom: 16px;
+      color: var(--primary);
+    }
+    .form-group { margin-bottom: 13px; }
+    .form-group label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 5px;
+    }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.92rem;
+      font-family: inherit;
+      color: var(--text);
+      background: #fff;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #1f2421;
+      color: #fff;
+      padding: 11px 16px;
+      border-radius: 10px;
+      font-size: 0.86rem;
+      font-weight: 500;
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: all 0.25s;
+      z-index: 2000;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    .footer-note {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 24px;
+    }
+
+    @media (max-width: 640px) {
+      header { padding: 20px 16px; }
+      .header-title h1 { font-size: 1.3rem; }
+      .item-row { padding: 11px 13px; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="header-title">
+        <h1>Full+Full Çeyiz Listesi</h1>
+        <p>Tikle, marka ve fiyat ekle, bütçeni tek yerden takip et.</p>
+      </div>
+      <div class="save-badge" id="saveBadge">
+        <span class="save-dot"></span>
+        <span>Bu cihazda otomatik kaydedilir</span>
+      </div>
+    </header>
+
+    <!-- Summary Cards -->
+    <section class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Genel İlerleme</div>
+        <div class="stat-value" id="statProgress">0%</div>
+        <div class="stat-sub" id="statCount">0 / 0 ürün alındı</div>
+        <div class="progress-bar"><div class="progress-fill" id="progressBar" style="width:0%"></div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">
+          <span>Hedef Bütçe</span>
+          <button class="budget-edit-btn" onclick="openBudgetModal()">Düzenle</button>
+        </div>
+        <div class="stat-value" id="statBudget">0 ₺</div>
+        <div class="stat-sub" id="statBudgetRemaining">Hedef belirlemek için düzenle</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Harcanan (Alınanlar)</div>
+        <div class="stat-value under-budget" id="statSpent">0 ₺</div>
+        <div class="stat-sub">Tiklenen ürünlerin toplamı</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Toplam Planlanan</div>
+        <div class="stat-value" id="statPlanned">0 ₺</div>
+        <div class="stat-sub" id="statRemainingCost">Alınacaklar: 0 ₺</div>
+      </div>
+    </section>
+
+    <!-- Controls -->
+    <section class="toolbar">
+      <div class="toolbar-row">
+        <div class="search-box">
+          <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" id="searchInput" placeholder="Ürün, marka veya not ara..." oninput="render()" />
+        </div>
+        <div class="status-pills">
+          <button class="status-pill active" data-status="all" onclick="setStatusFilter('all', this)">Tümü</button>
+          <button class="status-pill" data-status="todo" onclick="setStatusFilter('todo', this)">Alınacak</button>
+          <button class="status-pill" data-status="done" onclick="setStatusFilter('done', this)">Alındı</button>
+        </div>
+      </div>
+
+      <div class="toolbar-row">
+        <div class="tabs" id="categoryTabs"></div>
+        <div class="btn-group">
+          <button class="btn btn-primary" onclick="openItemModal()">+ Ürün Ekle</button>
+          <button class="btn" onclick="exportCSV()" title="Excel ile açılabilir CSV indir">Excel (CSV)</button>
+          <button class="btn" onclick="exportJSON()" title="Yedek dosyası indir">Yedek Al</button>
+          <button class="btn" onclick="document.getElementById('importFile').click()" title="Yedek dosyasından geri yükle">Yedek Yükle</button>
+          <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)" />
+          <button class="btn btn-danger" onclick="resetAll()" title="Varsayılan listeye dön">Sıfırla</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- List Container -->
+    <main id="listContainer"></main>
+
+    <p class="footer-note">
+      Tüm değişiklikler tarayıcınızda otomatik olarak saklanır. Farklı bir cihaza geçerken "Yedek Al" ve "Yedek Yükle" butonlarını kullanabilirsiniz.
+    </p>
+  </div>
+
+  <!-- Add/Edit Item Modal -->
+  <div class="modal-overlay" id="itemModal">
+    <div class="modal">
+      <h2 id="modalTitle">Yeni Ürün Ekle</h2>
+      <input type="hidden" id="editId" />
+      <div class="form-group">
+        <label for="itemName">Ürün Adı *</label>
+        <input type="text" id="itemName" placeholder="Örn: Kahve makinesi" />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="itemCategory">Ana Kategori</label>
+          <select id="itemCategory">
+            <option value="Beyaz Eşya ve Elektronik">Beyaz Eşya ve Elektronik</option>
+            <option value="Mutfak">Mutfak</option>
+            <option value="Ev Tekstili, Yatak Odası ve Banyo">Ev Tekstili, Yatak Odası ve Banyo</option>
+            <option value="Mobilya, Temizlik ve Pratik İhtiyaçlar">Mobilya, Temizlik ve Pratik İhtiyaçlar</option>
+            <option value="Diğer">Diğer</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="itemSubcategory">Alt Kategori</label>
+          <input type="text" id="itemSubcategory" placeholder="Örn: Mutfak Elektroniği" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="itemBrand">Marka / Mağaza</label>
+          <input type="text" id="itemBrand" placeholder="Örn: Bosch, Karaca, IKEA" />
+        </div>
+        <div class="form-group">
+          <label for="itemPrice">Birim Fiyat (₺)</label>
+          <input type="number" id="itemPrice" min="0" step="1" placeholder="0" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="itemQty">Adet</label>
+          <input type="number" id="itemQty" min="1" step="1" value="1" />
+        </div>
+        <div class="form-group" style="display:flex;align-items:flex-end;padding-bottom:8px;">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin:0;color:var(--text);">
+            <input type="checkbox" id="itemChecked" style="width:18px;height:18px;accent-color:var(--primary);" />
+            <span>Alındı olarak işaretle</span>
+          </label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="itemNote">Not / Link</label>
+        <textarea id="itemNote" rows="2" placeholder="Renk tercihi, ölçü, indirim notu vb."></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn" onclick="closeModal('itemModal')">İptal</button>
+        <button class="btn btn-primary" onclick="saveItem()">Kaydet</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Budget Modal -->
+  <div class="modal-overlay" id="budgetModal">
+    <div class="modal" style="max-width:380px;">
+      <h2>Hedef Bütçe Belirle</h2>
+      <div class="form-group">
+        <label for="budgetInput">Toplam Hedef Bütçe (₺)</label>
+        <input type="number" id="budgetInput" min="0" step="1000" placeholder="Örn: 350000" />
+      </div>
+      <div class="modal-actions">
+        <button class="btn" onclick="closeModal('budgetModal')">İptal</button>
+        <button class="btn btn-primary" onclick="saveBudget()">Kaydet</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const STORAGE_KEY = 'ceyiz_listesi_v1_data';
+    const BUDGET_KEY = 'ceyiz_listesi_v1_budget';
+    const DEFAULT_ITEMS = [{"id": "item_1", "category": "Beyaz Eşya ve Elektronik", "subcategory": "Ana Beyaz Eşyalar", "name": "Buzdolabı (No-Frost, mutfak ölçüsüne uygun)", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_2", "category": "Beyaz Eşya ve Elektronik", "subcategory": "Ana Beyaz Eşyalar", "name": "Çamaşır makinesi", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_3", "category": "Beyaz Eşya ve Elektronik", "subcategory": "Ana Beyaz Eşyalar", "name": "Kurutma makinesi", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_4", "category": "Beyaz Eşya ve Elektronik", "subcategory": "Ana Beyaz Eşyalar", "name": "Bulaşık makinesi", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_5", "category": "Beyaz Eşya ve Elektronik", "subcategory": "Ana Beyaz Eşyalar", "name": "Ankastre set (fırın, ocak, davlumbaz) veya solo fırın", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_6", "category": "Beyaz Eşya ve Elektronik", "subcategory": "Ana Beyaz Eşyalar", "name": "Mikrodalga fırın", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_7", "category": "Beyaz Eşya ve Elektronik", "subcategory": "Mutfak Elektroniği", "name": "Türk kahvesi makinesi", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_8", "category": "Beyaz Eşya ve Elektronik", "subcategory": "Mutfak Elektroniği", "name": "Çay makinesi / su ısıtıcı (kettle)", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_9", "category": "Beyaz Eşya ve Elektronik", "subcategory": "Mutfak Elektroniği", "name": "Filtre kahve veya espresso makinesi", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_10", "category": "Beyaz Eşya ve Elektronik", "subcategory": "Mutfak Elektroniği", "name": "Tost makinesi (döküm, çıkarılabilir plakalı)", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_11", "category": "Beyaz Eşya ve Elektronik", "subcategory": "Mutfak Elektroniği", "name": "Blender seti (el blenderı, rondo, mikser)", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_12", "category": "Beyaz Eşya ve Elektronik", "subcategory": "Mutfak Elektroniği", "name": "Airfryer", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_13", "category": "Beyaz Eşya ve Elektronik", "subcategory": "Mutfak Elektroniği", "name": "Ekmek kızartma makinesi", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_14", "category": "Beyaz Eşya ve Elektronik", "subcategory": "Mutfak Elektroniği", "name": "Mutfak tartısı", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_15", "category": "Beyaz Eşya ve Elektronik", "subcategory": "Mutfak Elektroniği", "name": "Mutfak şefi / hamur yoğurma makinesi (opsiyonel)", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_16", "category": "Beyaz Eşya ve Elektronik", "subcategory": "Mutfak Elektroniği", "name": "Katı meyve / narenciye sıkacağı (opsiyonel)", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_17", "category": "Beyaz Eşya ve Elektronik", "subcategory": "Mutfak Elektroniği", "name": "Waffle makinesi (opsiyonel)", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_18", "category": "Beyaz Eşya ve Elektronik", "subcategory": "Ev ve Kişisel Bakım Elektroniği", "name": "Dikey şarjlı süpürge veya kablolu ana süpürge", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_19", "category": "Beyaz Eşya ve Elektronik", "subcategory": "Ev ve Kişisel Bakım Elektroniği", "name": "Robot süpürge (opsiyonel)", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_20", "category": "Beyaz Eşya ve Elektronik", "subcategory": "Ev ve Kişisel Bakım Elektroniği", "name": "Buharlı ütü veya buhar kazanlı ütü", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_21", "category": "Beyaz Eşya ve Elektronik", "subcategory": "Ev ve Kişisel Bakım Elektroniği", "name": "Televizyon", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_22", "category": "Beyaz Eşya ve Elektronik", "subcategory": "Ev ve Kişisel Bakım Elektroniği", "name": "Saç kurutma makinesi", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_23", "category": "Beyaz Eşya ve Elektronik", "subcategory": "Ev ve Kişisel Bakım Elektroniği", "name": "Klima veya vantilatör", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_24", "category": "Beyaz Eşya ve Elektronik", "subcategory": "Ev ve Kişisel Bakım Elektroniği", "name": "Akım korumalı prizler (TV, buzdolabı, PC için)", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_25", "category": "Mutfak", "subcategory": "Pişirme Grubu", "name": "Çelik tencere seti (pilav tenceresi dahil)", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_26", "category": "Mutfak", "subcategory": "Pişirme Grubu", "name": "Granit veya döküm tencere ve tava seti", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_27", "category": "Mutfak", "subcategory": "Pişirme Grubu", "name": "Düdüklü tencere", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_28", "category": "Mutfak", "subcategory": "Pişirme Grubu", "name": "Çaydanlık ve cezve takımı", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_29", "category": "Mutfak", "subcategory": "Pişirme Grubu", "name": "Sahan seti (yumurta/menemen için)", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_30", "category": "Mutfak", "subcategory": "Pişirme Grubu", "name": "Krep tavası, wok tava ve ızgara tava", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_31", "category": "Mutfak", "subcategory": "Pişirme Grubu", "name": "Borcam / cam fırın tepsileri (çeşitli boylarda)", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_32", "category": "Mutfak", "subcategory": "Pişirme Grubu", "name": "Kek kalıbı, tart/muffin kalıbı ve fırın tepsisi", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_33", "category": "Mutfak", "subcategory": "Yemek, Kahvaltı ve İçecek Takımları", "name": "12 kişilik misafir yemek takımı", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_34", "category": "Mutfak", "subcategory": "Yemek, Kahvaltı ve İçecek Takımları", "name": "6 kişilik günlük yemek takımı", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_35", "category": "Mutfak", "subcategory": "Yemek, Kahvaltı ve İçecek Takımları", "name": "6 veya 12 kişilik kahvaltı takımı", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_36", "category": "Mutfak", "subcategory": "Yemek, Kahvaltı ve İçecek Takımları", "name": "12 kişilik misafir çatal-kaşık-bıçak takımı", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_37", "category": "Mutfak", "subcategory": "Yemek, Kahvaltı ve İçecek Takımları", "name": "6 kişilik günlük çatal-kaşık-bıçak takımı", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_38", "category": "Mutfak", "subcategory": "Yemek, Kahvaltı ve İçecek Takımları", "name": "Misafir ve günlük su/meşrubat bardakları", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_39", "category": "Mutfak", "subcategory": "Yemek, Kahvaltı ve İçecek Takımları", "name": "Çay bardağı ve tabağı seti (günlük + misafir)", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_40", "category": "Mutfak", "subcategory": "Yemek, Kahvaltı ve İçecek Takımları", "name": "Türk kahvesi fincan takımları (günlük + misafir)", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_41", "category": "Mutfak", "subcategory": "Yemek, Kahvaltı ve İçecek Takımları", "name": "Kupa takımı, kadeh seti, sürahi ve karaf", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_42", "category": "Mutfak", "subcategory": "Hazırlık ve Küçük Araç Gereçler", "name": "Kesme tahtaları (et, sebze ve ekmek için ayrı)", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_43", "category": "Mutfak", "subcategory": "Hazırlık ve Küçük Araç Gereçler", "name": "Bıçak seti, ekmek bıçağı, bileyici ve mutfak makası", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_44", "category": "Mutfak", "subcategory": "Hazırlık ve Küçük Araç Gereçler", "name": "Silikon spatula, çırpıcı, maşa, yumurta fırçası", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_45", "category": "Mutfak", "subcategory": "Hazırlık ve Küçük Araç Gereçler", "name": "Tahta kaşıklar ve kepçe-kevgir servis seti", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_46", "category": "Mutfak", "subcategory": "Hazırlık ve Küçük Araç Gereçler", "name": "Kevgir, makarna ve tel süzgeç", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_47", "category": "Mutfak", "subcategory": "Hazırlık ve Küçük Araç Gereçler", "name": "Soyacak, rende, sarımsak ezici, limon sıkacağı", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_48", "category": "Mutfak", "subcategory": "Hazırlık ve Küçük Araç Gereçler", "name": "Konserve açacağı, şişe açacağı, tirbuşon, çay süzgeci", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_49", "category": "Mutfak", "subcategory": "Hazırlık ve Küçük Araç Gereçler", "name": "Havan, merdane, oklava, patates ezici, pizza ruleti", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_50", "category": "Mutfak", "subcategory": "Hazırlık ve Küçük Araç Gereçler", "name": "Ölçü kabı/kaşıkları, nihale (2-3 adet)", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_51", "category": "Mutfak", "subcategory": "Hazırlık ve Küçük Araç Gereçler", "name": "Fırın eldiveni, tencere tutacağı, yağ sıçratmaz kapak", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_52", "category": "Mutfak", "subcategory": "Saklama, Sunum ve Düzenleme", "name": "Vakumlu/cam erzak saklama kapları", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_53", "category": "Mutfak", "subcategory": "Saklama, Sunum ve Düzenleme", "name": "Baharatlık takımı, yağdanlık, sirkelik, tuzluk-biberlik", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_54", "category": "Mutfak", "subcategory": "Saklama, Sunum ve Düzenleme", "name": "Cam yemek saklama kapları ve kavanozlar", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_55", "category": "Mutfak", "subcategory": "Saklama, Sunum ve Düzenleme", "name": "Ekmeklik, peçetelik, kağıt havluluk", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_56", "category": "Mutfak", "subcategory": "Saklama, Sunum ve Düzenleme", "name": "Salata kurutucu, geniş salata ve karıştırma kaseleri", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_57", "category": "Mutfak", "subcategory": "Saklama, Sunum ve Düzenleme", "name": "Servis tepsileri, pasta servis seti, çerezlik/sunumluk", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_58", "category": "Mutfak", "subcategory": "Saklama, Sunum ve Düzenleme", "name": "Mutfak çöp kovası, bulaşık sepeti/matı", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_59", "category": "Mutfak", "subcategory": "Saklama, Sunum ve Düzenleme", "name": "Çekmece içi kaşıklık ve buzdolabı düzenleyicileri", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_60", "category": "Ev Tekstili, Yatak Odası ve Banyo", "subcategory": "Yatak Odası Tekstili", "name": "Çift kişilik nevresim takımları (günlük 3-4 + misafir 1)", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_61", "category": "Ev Tekstili, Yatak Odası ve Banyo", "subcategory": "Yatak Odası Tekstili", "name": "Tek kişilik misafir nevresim takımları (1-2 adet)", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_62", "category": "Ev Tekstili, Yatak Odası ve Banyo", "subcategory": "Yatak Odası Tekstili", "name": "Yedek lastikli çarşaflar (pamuklu)", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_63", "category": "Ev Tekstili, Yatak Odası ve Banyo", "subcategory": "Yatak Odası Tekstili", "name": "Sıvı geçirmez yatak alezi (2 adet) ve yastık alezleri", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_64", "category": "Ev Tekstili, Yatak Odası ve Banyo", "subcategory": "Yatak Odası Tekstili", "name": "Yorganlar (çift kişilik 1-2, tek kişilik 1-2)", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_65", "category": "Ev Tekstili, Yatak Odası ve Banyo", "subcategory": "Yatak Odası Tekstili", "name": "Yastıklar (en az 4-6 adet)", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_66", "category": "Ev Tekstili, Yatak Odası ve Banyo", "subcategory": "Yatak Odası Tekstili", "name": "Pike takımı, yatak örtüsü, battaniye ve TV şalı", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_67", "category": "Ev Tekstili, Yatak Odası ve Banyo", "subcategory": "Yatak Odası Tekstili", "name": "Kıyafet askıları, hurçlar ve çekmece düzenleyiciler", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_68", "category": "Ev Tekstili, Yatak Odası ve Banyo", "subcategory": "Banyo Tekstili ve Aksesuarları", "name": "Eşli bornoz takımı (2 adet)", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_69", "category": "Ev Tekstili, Yatak Odası ve Banyo", "subcategory": "Banyo Tekstili ve Aksesuarları", "name": "Banyo/vücut havluları (en az 4-6 adet)", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_70", "category": "Ev Tekstili, Yatak Odası ve Banyo", "subcategory": "Banyo Tekstili ve Aksesuarları", "name": "El ve yüz havluları (günlük + misafir)", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_71", "category": "Ev Tekstili, Yatak Odası ve Banyo", "subcategory": "Banyo Tekstili ve Aksesuarları", "name": "Ayak havlusu ve banyo paspas takımı (2'li)", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_72", "category": "Ev Tekstili, Yatak Odası ve Banyo", "subcategory": "Banyo Tekstili ve Aksesuarları", "name": "Banyo aksesuar seti (sabunluk, fırçalık, çöp kovası, klozet fırçası)", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_73", "category": "Ev Tekstili, Yatak Odası ve Banyo", "subcategory": "Banyo Tekstili ve Aksesuarları", "name": "Kirli çamaşır sepeti ve çamaşır yıkama fileleri", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_74", "category": "Ev Tekstili, Yatak Odası ve Banyo", "subcategory": "Banyo Tekstili ve Aksesuarları", "name": "Duş rafı (şampuanlık), banyo tartısı, lif ve kese", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_75", "category": "Ev Tekstili, Yatak Odası ve Banyo", "subcategory": "Salon ve Mutfak Tekstili", "name": "Perdeler (tül, fon, güneşlik veya stor)", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_76", "category": "Ev Tekstili, Yatak Odası ve Banyo", "subcategory": "Salon ve Mutfak Tekstili", "name": "Halılar (salon, yatak odası, mutfak, antre)", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_77", "category": "Ev Tekstili, Yatak Odası ve Banyo", "subcategory": "Salon ve Mutfak Tekstili", "name": "Masa örtüleri (günlük + misafir + runner) ve amerikan servis", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_78", "category": "Ev Tekstili, Yatak Odası ve Banyo", "subcategory": "Salon ve Mutfak Tekstili", "name": "Mutfak kurulama ve el bezleri (8-10 adet) + mutfak önlüğü", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_79", "category": "Ev Tekstili, Yatak Odası ve Banyo", "subcategory": "Salon ve Mutfak Tekstili", "name": "Kırlentler ve yedek kılıfları", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_80", "category": "Mobilya, Temizlik ve Pratik İhtiyaçlar", "subcategory": "Mobilya ve Aydınlatma", "name": "Salon koltuk / oturma grubu ve TV ünitesi", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_81", "category": "Mobilya, Temizlik ve Pratik İhtiyaçlar", "subcategory": "Mobilya ve Aydınlatma", "name": "Yemek masası, sandalyeler, konsol", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_82", "category": "Mobilya, Temizlik ve Pratik İhtiyaçlar", "subcategory": "Mobilya ve Aydınlatma", "name": "Orta sehpa ve zigon sehpalar", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_83", "category": "Mobilya, Temizlik ve Pratik İhtiyaçlar", "subcategory": "Mobilya ve Aydınlatma", "name": "Yatak odası: Baza, başlık ve ortopedik yatak", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_84", "category": "Mobilya, Temizlik ve Pratik İhtiyaçlar", "subcategory": "Mobilya ve Aydınlatma", "name": "Gardırop, komodinler, şifonyer / makyaj masası", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_85", "category": "Mobilya, Temizlik ve Pratik İhtiyaçlar", "subcategory": "Mobilya ve Aydınlatma", "name": "Mutfak masası ve sandalyeleri", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_86", "category": "Mobilya, Temizlik ve Pratik İhtiyaçlar", "subcategory": "Mobilya ve Aydınlatma", "name": "Vestiyer / ayakkabılık ve boy aynası", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_87", "category": "Mobilya, Temizlik ve Pratik İhtiyaçlar", "subcategory": "Mobilya ve Aydınlatma", "name": "Çalışma masası ve koltuğu", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_88", "category": "Mobilya, Temizlik ve Pratik İhtiyaçlar", "subcategory": "Mobilya ve Aydınlatma", "name": "Oda avizeleri, lambader ve komodin abajurları", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_89", "category": "Mobilya, Temizlik ve Pratik İhtiyaçlar", "subcategory": "Temizlik ve Çamaşır Ekipmanları", "name": "Ütü masası (geniş ve sağlam ayaklı)", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_90", "category": "Mobilya, Temizlik ve Pratik İhtiyaçlar", "subcategory": "Temizlik ve Çamaşır Ekipmanları", "name": "Çamaşır kurutmalığı, mandal ve mandal sepeti", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_91", "category": "Mobilya, Temizlik ve Pratik İhtiyaçlar", "subcategory": "Temizlik ve Çamaşır Ekipmanları", "name": "Kovalı mop / vilada seti, fırça ve faraş", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_92", "category": "Mobilya, Temizlik ve Pratik İhtiyaçlar", "subcategory": "Temizlik ve Çamaşır Ekipmanları", "name": "Mikrofiber temizlik bezleri (cam, mutfak, banyo, toz)", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_93", "category": "Mobilya, Temizlik ve Pratik İhtiyaçlar", "subcategory": "Temizlik ve Çamaşır Ekipmanları", "name": "Cam/duşakabin çekceği, kova ve çok amaçlı leğen", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_94", "category": "Mobilya, Temizlik ve Pratik İhtiyaçlar", "subcategory": "Tamirat, Güvenlik ve Pratik Kurtarıcılar", "name": "Temel alet çantası (tornavida, kontrol kalemi, çekiç, pense, alyan, metre, bant, dübel-vida)", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_95", "category": "Mobilya, Temizlik ve Pratik İhtiyaçlar", "subcategory": "Tamirat, Güvenlik ve Pratik Kurtarıcılar", "name": "Şarjlı matkap", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_96", "category": "Mobilya, Temizlik ve Pratik İhtiyaçlar", "subcategory": "Tamirat, Güvenlik ve Pratik Kurtarıcılar", "name": "3 veya 4 basamaklı katlanır ev merdiveni", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_97", "category": "Mobilya, Temizlik ve Pratik İhtiyaçlar", "subcategory": "Tamirat, Güvenlik ve Pratik Kurtarıcılar", "name": "Farklı uzunluklarda uzatma kabloları / çoklu prizler", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_98", "category": "Mobilya, Temizlik ve Pratik İhtiyaçlar", "subcategory": "Tamirat, Güvenlik ve Pratik Kurtarıcılar", "name": "İlk yardım çantası ve temel dikiş seti", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_99", "category": "Mobilya, Temizlik ve Pratik İhtiyaçlar", "subcategory": "Tamirat, Güvenlik ve Pratik Kurtarıcılar", "name": "Kapı önü paspası, ayakkabı çekeceği, misafir terlikleri (3-4 çift)", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}, {"id": "item_100", "category": "Mobilya, Temizlik ve Pratik İhtiyaçlar", "subcategory": "Tamirat, Güvenlik ve Pratik Kurtarıcılar", "name": "Şemsiyelik, yedek ampuller ve yedek piller", "checked": false, "brand": "", "price": 0, "qty": 1, "note": ""}];
+
+    let items = [];
+    let budgetTarget = 0;
+    let activeCategory = 'Tümü';
+    let statusFilter = 'all';
+    let collapsedCategories = {};
+
+    function loadData() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            items = parsed;
+          } else {
+            items = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
+          }
+        } else {
+          items = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
+        }
+        const savedBudget = localStorage.getItem(BUDGET_KEY);
+        budgetTarget = savedBudget ? Number(savedBudget) || 0 : 0;
+      } catch (e) {
+        items = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
+        budgetTarget = 0;
+      }
+    }
+
+    function persist() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+        localStorage.setItem(BUDGET_KEY, String(budgetTarget));
+      } catch (e) {
+        showToast('Tarayıcı depolama alanı dolu veya kapalı.');
+      }
+    }
+
+    function formatTRY(num) {
+      return new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 }).format(num || 0) + ' ₺';
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+    }
+
+    function setStatusFilter(status, el) {
+      statusFilter = status;
+      document.querySelectorAll('.status-pill').forEach(p => p.classList.remove('active'));
+      el.classList.add('active');
+      render();
+    }
+
+    function setCategoryFilter(cat) {
+      activeCategory = cat;
+      render();
+    }
+
+    function toggleCategory(cat) {
+      collapsedCategories[cat] = !collapsedCategories[cat];
+      render();
+    }
+
+    function toggleCheck(id) {
+      const item = items.find(i => i.id === id);
+      if (!item) return;
+      item.checked = !item.checked;
+      persist();
+      render();
+    }
+
+    function updateStats() {
+      const total = items.length;
+      const done = items.filter(i => i.checked).length;
+      const pct = total ? Math.round((done / total) * 100) : 0;
+
+      let planned = 0;
+      let spent = 0;
+      items.forEach(i => {
+        const cost = (Number(i.price) || 0) * (Number(i.qty) || 1);
+        planned += cost;
+        if (i.checked) spent += cost;
+      });
+      const remainingCost = planned - spent;
+
+      document.getElementById('statProgress').textContent = pct + '%';
+      document.getElementById('statCount').textContent = `${done} / ${total} ürün alındı`;
+      document.getElementById('progressBar').style.width = pct + '%';
+
+      document.getElementById('statSpent').textContent = formatTRY(spent);
+      document.getElementById('statPlanned').textContent = formatTRY(planned);
+      document.getElementById('statRemainingCost').textContent = `Alınacaklar: ${formatTRY(remainingCost)}`;
+
+      document.getElementById('statBudget').textContent = budgetTarget > 0 ? formatTRY(budgetTarget) : 'Belirlenmedi';
+      const remEl = document.getElementById('statBudgetRemaining');
+      remEl.className = 'stat-sub';
+      if (budgetTarget > 0) {
+        const diff = budgetTarget - spent;
+        if (diff >= 0) {
+          remEl.textContent = `Kalan bütçe: ${formatTRY(diff)}`;
+          remEl.classList.add('under-budget');
+        } else {
+          remEl.textContent = `Bütçe aşımı: ${formatTRY(Math.abs(diff))}`;
+          remEl.classList.add('over-budget');
+        }
+      } else {
+        remEl.textContent = 'Hedef belirlemek için düzenle';
+      }
+    }
+
+    function renderCategoryTabs() {
+      const cats = ['Tümü', ...Array.from(new Set(items.map(i => i.category)))];
+      if (!cats.includes(activeCategory)) activeCategory = 'Tümü';
+      const container = document.getElementById('categoryTabs');
+      container.innerHTML = cats.map(cat => {
+        const active = cat === activeCategory ? 'active' : '';
+        const label = cat.length > 26 ? cat.slice(0, 24) + '…' : cat;
+        return `<button class="tab ${active}" onclick="setCategoryFilter('${escapeHtml(cat)}')">${escapeHtml(label)}</button>`;
+      }).join('');
+    }
+
+    function render() {
+      updateStats();
+      renderCategoryTabs();
+
+      const q = document.getElementById('searchInput').value.trim().toLowerCase();
+      const filtered = items.filter(item => {
+        if (activeCategory !== 'Tümü' && item.category !== activeCategory) return false;
+        if (statusFilter === 'done' && !item.checked) return false;
+        if (statusFilter === 'todo' && item.checked) return false;
+        if (q) {
+          const hay = `${item.name} ${item.brand} ${item.note} ${item.subcategory} ${item.category}`.toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        return true;
+      });
+
+      const listEl = document.getElementById('listContainer');
+      if (filtered.length === 0) {
+        listEl.innerHTML = `<div class="empty-state">Aradığınız kriterlere uygun ürün bulunamadı.</div>`;
+        return;
+      }
+
+      // Group by category -> subcategory
+      const groups = {};
+      filtered.forEach(item => {
+        if (!groups[item.category]) groups[item.category] = {};
+        const sub = item.subcategory || 'Genel';
+        if (!groups[item.category][sub]) groups[item.category][sub] = [];
+        groups[item.category][sub].push(item);
+      });
+
+      let html = '';
+      Object.entries(groups).forEach(([cat, subMap]) => {
+        const catAll = items.filter(i => i.category === cat);
+        const catDone = catAll.filter(i => i.checked).length;
+        const catPct = catAll.length ? Math.round((catDone / catAll.length) * 100) : 0;
+        const isCollapsed = !!collapsedCategories[cat] && !q;
+
+        html += `
+          <div class="category-block">
+            <div class="category-header" onclick="toggleCategory('${escapeHtml(cat)}')">
+              <div class="category-title">
+                <span>${isCollapsed ? '▸' : '▾'}</span>
+                <span>${escapeHtml(cat)}</span>
+              </div>
+              <div class="category-meta">
+                <span>${catDone}/${catAll.length}</span>
+                <div class="mini-bar"><div class="mini-fill" style="width:${catPct}%"></div></div>
+                <span>%${catPct}</span>
+              </div>
+            </div>
+        `;
+
+        if (!isCollapsed) {
+          Object.entries(subMap).forEach(([sub, subItems]) => {
+            html += `<div class="subcategory-header">${escapeHtml(sub)}</div>`;
+            subItems.forEach(item => {
+              const totalPrice = (Number(item.price) || 0) * (Number(item.qty) || 1);
+              let badges = '';
+              if (item.brand) badges += `<span class="badge">Marka: ${escapeHtml(item.brand)}</span>`;
+              if (Number(item.qty) > 1) badges += `<span class="badge">${item.qty} adet</span>`;
+              if (totalPrice > 0) badges += `<span class="badge badge-price">${formatTRY(totalPrice)}</span>`;
+              if (item.note) badges += `<span class="badge badge-note">${escapeHtml(item.note)}</span>`;
+
+              html += `
+                <div class="item-row ${item.checked ? 'checked' : ''}">
+                  <div class="checkbox-wrap">
+                    <input type="checkbox" class="item-checkbox" ${item.checked ? 'checked' : ''} onchange="toggleCheck('${item.id}')" />
+                  </div>
+                  <div class="item-main" onclick="toggleCheck('${item.id}')">
+                    <div class="item-name">${escapeHtml(item.name)}</div>
+                    ${badges ? `<div class="item-badges">${badges}</div>` : ''}
+                  </div>
+                  <div class="item-actions">
+                    <button class="icon-btn" title="Düzenle" onclick="openItemModal('${item.id}')">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                    </button>
+                    <button class="icon-btn del" title="Sil" onclick="deleteItem('${item.id}')">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                    </button>
+                  </div>
+                </div>
+              `;
+            });
+          });
+        }
+        html += `</div>`;
+      });
+
+      listEl.innerHTML = html;
+    }
+
+    function openItemModal(id = null) {
+      const modal = document.getElementById('itemModal');
+      if (id) {
+        const item = items.find(i => i.id === id);
+        if (!item) return;
+        document.getElementById('modalTitle').textContent = 'Ürünü Düzenle';
+        document.getElementById('editId').value = item.id;
+        document.getElementById('itemName').value = item.name;
+        const catSel = document.getElementById('itemCategory');
+        if (![...catSel.options].some(o => o.value === item.category)) {
+          const opt = document.createElement('option');
+          opt.value = item.category;
+          opt.textContent = item.category;
+          catSel.appendChild(opt);
+        }
+        catSel.value = item.category;
+        document.getElementById('itemSubcategory').value = item.subcategory || '';
+        document.getElementById('itemBrand').value = item.brand || '';
+        document.getElementById('itemPrice').value = item.price || '';
+        document.getElementById('itemQty').value = item.qty || 1;
+        document.getElementById('itemChecked').checked = !!item.checked;
+        document.getElementById('itemNote').value = item.note || '';
+      } else {
+        document.getElementById('modalTitle').textContent = 'Yeni Ürün Ekle';
+        document.getElementById('editId').value = '';
+        document.getElementById('itemName').value = '';
+        document.getElementById('itemCategory').value = activeCategory !== 'Tümü' ? activeCategory : 'Mutfak';
+        document.getElementById('itemSubcategory').value = '';
+        document.getElementById('itemBrand').value = '';
+        document.getElementById('itemPrice').value = '';
+        document.getElementById('itemQty').value = 1;
+        document.getElementById('itemChecked').checked = false;
+        document.getElementById('itemNote').value = '';
+      }
+      modal.classList.add('open');
+      setTimeout(() => document.getElementById('itemName').focus(), 60);
+    }
+
+    function saveItem() {
+      const name = document.getElementById('itemName').value.trim();
+      if (!name) {
+        showToast('Lütfen ürün adı girin.');
+        return;
+      }
+      const id = document.getElementById('editId').value;
+      const payload = {
+        category: document.getElementById('itemCategory').value,
+        subcategory: document.getElementById('itemSubcategory').value.trim() || 'Genel',
+        name,
+        brand: document.getElementById('itemBrand').value.trim(),
+        price: Math.max(0, Number(document.getElementById('itemPrice').value) || 0),
+        qty: Math.max(1, Number(document.getElementById('itemQty').value) || 1),
+        checked: document.getElementById('itemChecked').checked,
+        note: document.getElementById('itemNote').value.trim()
+      };
+
+      if (id) {
+        const idx = items.findIndex(i => i.id === id);
+        if (idx !== -1) items[idx] = { ...items[idx], ...payload };
+        showToast('Ürün güncellendi.');
+      } else {
+        items.unshift({ id: 'item_' + Date.now(), ...payload });
+        showToast('Yeni ürün eklendi.');
+      }
+      persist();
+      closeModal('itemModal');
+      render();
+    }
+
+    function deleteItem(id) {
+      const item = items.find(i => i.id === id);
+      if (!item) return;
+      if (!confirm(`"${item.name}" ürününü silmek istediğinize emin misiniz?`)) return;
+      items = items.filter(i => i.id !== id);
+      persist();
+      render();
+      showToast('Ürün silindi.');
+    }
+
+    function openBudgetModal() {
+      document.getElementById('budgetInput').value = budgetTarget || '';
+      document.getElementById('budgetModal').classList.add('open');
+      setTimeout(() => document.getElementById('budgetInput').focus(), 60);
+    }
+
+    function saveBudget() {
+      budgetTarget = Math.max(0, Number(document.getElementById('budgetInput').value) || 0);
+      persist();
+      closeModal('budgetModal');
+      render();
+      showToast('Hedef bütçe kaydedildi.');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('open');
+    }
+
+    function exportJSON() {
+      const data = { version: 1, exportedAt: new Date().toISOString(), budgetTarget, items };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'ceyiz-listesi-yedek.json';
+      a.click();
+      URL.revokeObjectURL(a.href);
+      showToast('Yedek dosyası indirildi.');
+    }
+
+    function importJSON(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          const importedItems = Array.isArray(parsed) ? parsed : parsed.items;
+          if (!Array.isArray(importedItems)) throw new Error('Geçersiz format');
+          items = importedItems;
+          if (typeof parsed.budgetTarget === 'number') budgetTarget = parsed.budgetTarget;
+          persist();
+          render();
+          showToast('Yedek başarıyla yüklendi.');
+        } catch (err) {
+          showToast('Yedek dosyası okunamadı.');
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = '';
+    }
+
+    function exportCSV() {
+      const headers = ['Durum', 'Kategori', 'Alt Kategori', 'Ürün', 'Marka/Mağaza', 'Adet', 'Birim Fiyat (TL)', 'Toplam (TL)', 'Not'];
+      const rows = items.map(i => {
+        const qty = Number(i.qty) || 1;
+        const price = Number(i.price) || 0;
+        return [
+          i.checked ? 'Alındı' : 'Alınacak',
+          i.category,
+          i.subcategory,
+          i.name,
+          i.brand || '',
+          qty,
+          price,
+          qty * price,
+          i.note || ''
+        ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(';');
+      });
+      const csv = '\uFEFF' + headers.join(';') + '\n' + rows.join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'ceyiz-listesi.csv';
+      a.click();
+      URL.revokeObjectURL(a.href);
+      showToast('Excel (CSV) dosyası indirildi.');
+    }
+
+    function resetAll() {
+      if (!confirm('Tüm tikler, fiyatlar ve eklediğiniz ürünler silinip varsayılan listeye dönülecek. Emin misiniz?')) return;
+      items = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
+      budgetTarget = 0;
+      persist();
+      render();
+      showToast('Liste varsayılan haline sıfırlandı.');
+    }
+
+    // Close modals on backdrop click or Escape
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+      overlay.addEventListener('click', e => {
+        if (e.target === overlay) overlay.classList.remove('open');
+      });
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
+      }
+    });
+
+    loadData();
+    render();
+  </script>
+</body>
+</html>
